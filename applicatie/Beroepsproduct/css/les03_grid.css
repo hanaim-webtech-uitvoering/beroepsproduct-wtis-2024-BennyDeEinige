@@ -1,0 +1,16 @@
+
+.grid{
+    display: flex;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 10fr));
+    grid-gap: 1rem;
+    justify-content: center;
+    align-items: center;
+}
+
+
+ 
+.vlucht {
+    padding: 1em;
+    border: 2px solid black;
+    background: burlywood;
+}

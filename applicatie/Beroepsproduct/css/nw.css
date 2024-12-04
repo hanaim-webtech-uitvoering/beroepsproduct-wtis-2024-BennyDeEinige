@@ -1,0 +1,193 @@
+.card-container {
+    display: flex;
+    flex-wrap: wrap; /* Zorgt ervoor dat items naar de volgende regel gaan als er geen ruimte is */
+    justify-content: center;
+    gap: 75px;
+  }
+  
+  .card {
+    flex: 1 1 250px;
+    max-width: 275px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    margin-bottom: 20px; /* Spacing onder de kaart */
+  }
+  
+  .card-image {
+    width: 100%;
+    height: auto;
+  }
+  
+  .card-title {
+    font-size: 1.2em;
+    margin: 15px;
+  }
+  
+  .card-description {
+    font-size: 0.9em;
+    margin: 0 15px 15px;
+    color: #666;
+  }
+  
+  .card-price {
+    font-size: 1em;
+    margin: 0 15px 15px;
+    font-weight: bold;
+  }
+  
+  .card-button {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .card-button:hover {
+    background-color: #218838;
+  }
+  
+  .container {
+    display: flex;
+    flex-wrap: wrap; /* Zorgt ervoor dat items naar de volgende regel gaan als er geen ruimte is */
+    justify-content: center;
+    gap: 75px;
+    padding: 5%;
+  }
+  
+  /* .form-field {
+    display: flex;
+    flex-direction: column;
+    padding: 2.5rem;
+    justify-content: space-between;
+    text-align: left;
+  } */
+  
+  .bestellingen-container {
+    display: flex;
+    flex-wrap: wrap; /* Zorgt ervoor dat items naar de volgende regel gaan als er geen ruimte is */
+    justify-content: center; /* Zorgt ervoor dat de bestellingen gecentreerd zijn */
+    gap: 20px; /* Ruimte tussen de bestellingen */
+    width: 100%; /* Zorgt ervoor dat de container de volledige breedte van de pagina gebruikt */
+    padding: 20px; /* Voeg padding toe om te zorgen dat de items niet tegen de rand van de container aan zitten */
+  }
+  
+  .bestelling {
+    flex: 1 1 250px; /* Bestelling krijgt een breedte van 250px, maar kan flexibel zijn */
+    max-width: 250px; /* Maximaal 250px breed */
+    background-color: #fff; /* Achtergrondkleur */
+    border-radius: 8px; /* Ronde hoeken */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Schaduw voor visuele uitstraling */
+    padding: 20px; /* Padding binnenin de bestelling */
+    margin-bottom: 20px; /* Ruimte onder de bestellingen */
+  }
+  
+  .bestelling table {
+    width: 100%; /* Zorgt ervoor dat de tabel de volledige breedte van de bestelling gebruikt */
+    border-collapse: collapse; /* Voorkomt dubbele lijnen in de tabel */
+  }
+  
+  .bestelling th,
+  .bestelling td {
+    padding: 8px;
+    border: 1px solid #ddd; /* Grijze randen voor de tabel */
+    text-align: left; /* Zet de tekst naar links */
+  }
+  
+  .bestelling th {
+    background-color: #f0f0f0; /* Achtergrondkleur voor de kopteksten */
+  }
+  
+
+
+
+
+  /* dit is voor php winkelmandje */
+
+  /* Winkelmand Container */
+.winkelmand-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Winkelmand Item */
+.winkelmand-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+}
+
+/* Item Details */
+.item-details h2 {
+  margin: 0 0 10px 0;
+  font-size: 18px;
+}
+
+.item-details p {
+  margin: 5px 0;
+  font-size: 16px;
+}
+
+/* Aantal Input */
+.aantal-input {
+  width: 50px;
+  text-align: center;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Winkelmand Totaal */
+.winkelmand-totaal {
+  margin-top: 20px;
+  text-align: right;
+}
+
+/* Afrekenen Button */
+.afrekenen {
+  background-color: #28a745;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+.afrekenen:hover {
+  background-color: #218838;
+}
+
+/* Verwijder knop */
+.verwijder-knop {
+  width: 125px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 20px;
+}
+
+.verwijder-knop:hover {
+  background-color: #c82333;
+}
+
+
+
