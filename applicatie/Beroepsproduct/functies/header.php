@@ -8,7 +8,7 @@
         </a>
         <br/>
         <br/>
-        <a href="inloggenmedewerker.php" class="medewerkerinlogknop">Inloggen medewerkers</a>
+        <a href="inloggenMedewerker.php" class="medewerkerinlogknop">Inloggen medewerkers</a>
         <br/>
         <br/>
         <br/>

@@ -3,7 +3,7 @@ require_once 'functies/db_connectie.php';
 require_once 'functies/loginMedewerker.php';
 session_start();
 if (isset($_SESSION['username'])) {
-    header("Location: medewerkerPagina.php");
+    header("Location: inloggenMedewerker.php");
     exit();
 }
 
@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
 
     if ($loginResult === true) {
         // Login succesvol, doorsturen naar profielpagina
-        header("Location: medewerkerPagina.php");
+        header("Location: inloggenMedewerker.php");
         exit;
     } else {
         // Foutmelding tonen

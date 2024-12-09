@@ -1,34 +1,56 @@
 <?php
 require_once 'functies/db_connectie.php';
-
 session_start();
 
 // Controleer of de gebruiker is ingelogd
-if (!isset($_SESSION['user'])) {
-    // Niet ingelogd: stuur ze naar de inlogpagina
-    header("Location: inloggen.php");
+if (!isset($_SESSION['username'])) {
+    header('Location: inloggen.php');
+    exit;
 }
 
-// Start de sessie om het winkelmandje op te slaan
+// Start winkelmand als sessie niet is ingesteld
 if (!isset($_SESSION['winkelmandje'])) {
     $_SESSION['winkelmandje'] = [];
 }
 
-// Verwerk formulier
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['aantal'])) {
-        // Werk hoeveelheden bij
-        foreach ($_POST['aantal'] as $index => $nieuwAantal) {
-            $_SESSION['winkelmandje'][$index]['aantal'] = max(1, intval($nieuwAantal));
+// Verwerk toevoegen aan winkelmand
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['product'], $_POST['prijs'], $_POST['aantal'])) {
+    $productNaam = $_POST['product'];
+    $productPrijs = floatval($_POST['prijs']);
+    $productAantal = intval($_POST['aantal']);
+
+    // Controleer of product al in de winkelmand zit
+    $productBestaat = false;
+    foreach ($_SESSION['winkelmandje'] as $item) {
+        if ($item['naam'] === $productNaam) {
+            $productBestaat = true;
+            $_SESSION['winkelmandje'][$item['id']]['aantal'] += $productAantal;
+            break;
         }
     }
 
-    if (isset($_POST['verwijder'])) {
-        // Verwijder een item uit het winkelmandje
-        $index = intval($_POST['verwijder']);
-        unset($_SESSION['winkelmandje'][$index]);
-        $_SESSION['winkelmandje'] = array_values($_SESSION['winkelmandje']); // Herindexeer de array
+    if (!$productBestaat) {
+        $_SESSION['winkelmandje'][] = [
+            'id' => count($_SESSION['winkelmandje']),
+            'naam' => $productNaam,
+            'prijs' => $productPrijs,
+            'aantal' => $productAantal
+        ];
     }
+
+    header('Location: winkelmand.php');
+    exit;
+}
+
+// Verwerk verwijderverzoek
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verwijder'])) {
+    $index = intval($_POST['verwijder']);
+    if (isset($_SESSION['winkelmandje'][$index])) {
+        unset($_SESSION['winkelmandje'][$index]);
+        $_SESSION['winkelmandje'] = array_values($_SESSION['winkelmandje']);
+    }
+    header('Location: winkelmand.php');
+    exit;
 }
 
 // Bereken totaal
@@ -61,6 +83,16 @@ foreach ($_SESSION['winkelmandje'] as $item) {
         <div class="winkelmand-container">
             <h2>Winkelmandje</h2>
 
+            <!-- Formulier om product toe te voegen aan winkelmand -->
+            <!-- <form method="POST">
+                <div>
+                    <input type="text" name="product" placeholder="Product naam" required>
+                    <input type="number" name="prijs" placeholder="Prijs" step="0.01" required>
+                    <input type="number" name="aantal" placeholder="Aantal" min="1" required>
+                    <button type="submit">Toevoegen</button>
+                </div>
+            </form> -->
+
             <form method="POST">
                 <?php if (!empty($_SESSION['winkelmandje'])): ?>
                     <?php foreach ($_SESSION['winkelmandje'] as $index => $item): ?>
@@ -73,13 +105,13 @@ foreach ($_SESSION['winkelmandje'] as $item) {
                                     <input type="number" name="aantal[<?php echo $index; ?>]" value="<?php echo $item['aantal']; ?>" class="aantal-input" min="1">
                                 </label>
                             </div>
+                            <!-- Verwijderknop -->
                             <button type="submit" name="verwijder" value="<?php echo $index; ?>" class="verwijder-knop">Verwijderen</button>
                         </div>
                     <?php endforeach; ?>
 
                     <div class="winkelmand-totaal">
                         <h3>Totaal: €<?php echo number_format($totaal, 2, ',', '.'); ?></h3>
-                        <button type="submit" class="afrekenen">Winkelmandje bijwerken</button>
                     </div>
                 <?php else: ?>
                     <p>Je winkelmandje is leeg.</p>
