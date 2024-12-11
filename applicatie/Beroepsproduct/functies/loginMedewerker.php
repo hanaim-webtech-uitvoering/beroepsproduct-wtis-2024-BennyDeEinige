@@ -15,8 +15,8 @@ function loginMedewerker($usern, $passw)
         $row = $query->fetch(PDO::FETCH_ASSOC);
 
         if ($row) {
-            // Controleer wachtwoord direct (zonder hash in dit voorbeeld)
-            if ($password === $row['password']) {
+            // Controleer wachtwoord direct
+            if (password_verify($password, $row['password'])) {
                 // Controleer de rol van de gebruiker
                 if ($row['role'] === 'Personnel') {
                     // Sessie starten en gebruiker opslaan

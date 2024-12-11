@@ -2,23 +2,25 @@
 require_once 'functies/db_connectie.php';
 require_once 'functies/loginMedewerker.php';
 session_start();
+
+// Als de gebruiker al is ingelogd, doorsturen naar medewerkerOverzicht.php
 if (isset($_SESSION['username'])) {
-    header("Location: inloggenMedewerker.php");
+    header("Location: bestellingsOverzicht.php");
     exit();
 }
 
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
-  $username = $_POST['username'];
-  $password = $_POST['wachtwoord'];
+    $username = $_POST['username'];
+    $password = $_POST['wachtwoord'];
 
     // Loginfunctie aanroepen
     $loginResult = loginMedewerker($username, $password);
 
     if ($loginResult === true) {
-        // Login succesvol, doorsturen naar profielpagina
-        header("Location: inloggenMedewerker.php");
+        // Login succesvol, doorsturen naar medewerkerOverzicht.php
+        header("Location: bestellingsOverzicht.php");
         exit;
     } else {
         // Foutmelding tonen
