@@ -1,10 +1,12 @@
 <?php
-require_once 'functies/db_connectie.php'; // Zorg ervoor dat dit bestand de juiste databaseverbinding bevat
-require_once 'functies/bestellingen.php'; // Zorg ervoor dat deze functie getRecentOrders bevat
+require_once 'functies/db_connectie.php'; 
+require_once 'functies/bestellingen.php'; 
+require_once 'functies/statusInText.php'; 
+
 
 session_start();
 
-// Controleer of de gebruiker is ingelogd en personeel is
+// Controleer of de gebruiker is ingelogd en personeel is!
 if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'Personnel') {
     header('Location: inloggen.php');
     exit;
@@ -12,20 +14,6 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'Personnel') {
 
 // Haal de recente bestellingen op
 $orders = bestellingen();
-
-// Functie om de status om te zetten naar tekst
-function getStatusText($status) {
-    switch ($status) {
-        case 1:
-            return "Ontvangen";
-        case 2:
-            return "Wordt voorbereid";
-        case 3:
-            return "Wordt bezorgd";
-        default:
-            return "Onbekend";
-    }
-}
 ?>
 
 <!DOCTYPE html>

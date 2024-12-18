@@ -47,14 +47,13 @@ $producten = haalProductenOp(); // Haal de producten op
     <div class="card-container">
       <?php foreach ($producten as $product): ?>
         <div class="card">
-          <img src="fotos/BBQChicken.png" alt="Product" class="card-image"> <!-- Dit wordt gebruikt als standaardafbeelding -->
           <h3 class="card-title"><?php echo htmlspecialchars($product['name']); ?></h3>
           <p class="card-price">€ <?php echo number_format($product['price'], 2, ',', '.'); ?></p>
           <form method="POST" action="winkelmand.php">
             <input type="hidden" name="product" value="<?php echo htmlspecialchars($product['name']); ?>">
             <input type="hidden" name="prijs" value="<?php echo htmlspecialchars($product['price']); ?>">
             <input type="hidden" name="aantal" value="1">
-            <button type="submit" class="card-button">TOEVOEGEN</button>
+            <button type="submit" class="card-button">TOEVOEGEN AAN WINKELMAND</button>
           </form>
         </div>
       <?php endforeach; ?>

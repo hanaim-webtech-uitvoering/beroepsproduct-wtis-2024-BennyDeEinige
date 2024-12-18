@@ -1,5 +1,7 @@
 <?php
-require_once 'functies/db_connectie.php'; // Zorg ervoor dat dit bestand de juiste databaseverbinding bevat
+require_once 'functies/db_connectie.php'; 
+require_once 'functies/statusInText.php'; 
+
 
 session_start();
 
@@ -34,7 +36,7 @@ try {
     // Haal de producten op
     $orderProducts = $stmt->fetchAll();
 
-    // Haal de orderdetails op van Pizza_order (optioneel)
+    // Haal de orderdetails op van Pizza_order 
     $queryOrder = 'SELECT * FROM Pizza_order WHERE order_id = :order_id';
     $stmtOrder = $db->prepare($queryOrder);
     $stmtOrder->bindParam(':order_id', $order_id, PDO::PARAM_INT);
@@ -44,20 +46,6 @@ try {
 } catch (Exception $e) {
     echo "Fout bij ophalen van de bestelling: " . $e->getMessage();
     exit;
-}
-
-// Functie om de status om te zetten naar tekst
-function getStatusText($status) {
-    switch ($status) {
-        case 1:
-            return "Ontvangen";
-        case 2:
-            return "Wordt voorbereid";
-        case 3:
-            return "Wordt bezorgd";
-        default:
-            return "Onbekend";
-    }
 }
 ?>
 
@@ -84,7 +72,7 @@ function getStatusText($status) {
     <h3>Bestelgegevens</h3>
     <p><strong>Klant Username:</strong> <?php echo $orderDetails['client_username']; ?></p>
     <p><strong>Medewerker Username:</strong> <?php echo $orderDetails['personnel_username']; ?></p>
-    <p><strong>Status:</strong> <?php echo getStatusText($orderDetails['status']); ?></p>  <!-- Toon de status als tekst -->
+    <p><strong>Status:</strong> <?php echo getStatusText($orderDetails['status']); ?></p>  
     <p><strong>Adres:</strong> <?php echo $orderDetails['address']; ?></p>
     <p><strong>Datum:</strong> <?php echo $orderDetails['datetime']; ?></p>
     
