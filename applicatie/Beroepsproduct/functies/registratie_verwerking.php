@@ -12,7 +12,7 @@ function registreerGebruiker($first_name, $last_name, $address, $username, $pass
 
     try {
         // Controleer of de gebruikersnaam al bestaat
-        $query = "SELECT * FROM dbo.Users WHERE username = ?";
+        $query = "SELECT * FROM Users WHERE username = ?";
         $stmt = $db->prepare($query);
         $stmt->execute([$username]);
 
@@ -21,7 +21,7 @@ function registreerGebruiker($first_name, $last_name, $address, $username, $pass
             return "Deze gebruikersnaam is al in gebruik!";
         } else {
             // Voeg de nieuwe gebruiker toe met de rol 'Client'
-            $query = "INSERT INTO dbo.Users (first_name, last_name, address, username, password, role) 
+            $query = "INSERT INTO Users (first_name, last_name, address, username, password, role) 
                       VALUES (?, ?, ?, ?, ?, ?)";
             $stmt = $db->prepare($query);
             $stmt->execute([$first_name, $last_name, $address, $username, $hashedPassword, $role]);

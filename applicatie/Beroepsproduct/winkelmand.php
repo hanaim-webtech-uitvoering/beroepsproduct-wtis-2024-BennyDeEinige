@@ -4,11 +4,11 @@ require_once 'functies/bestellingVerwerken.php';
 
 session_start();
 
-// Controleer of de gebruiker is ingelogd
 if (!isset($_SESSION['username'])) {
-    echo "Je moet ingelogd zijn om een bestelling te plaatsen.";
+    header('Location: inloggen.php'); // Doorverwijzen naar de inlogpagina
     exit;
 }
+
 
 $clientUsername = $_SESSION['username'];  // Haal de gebruikersnaam op uit de sessie
 

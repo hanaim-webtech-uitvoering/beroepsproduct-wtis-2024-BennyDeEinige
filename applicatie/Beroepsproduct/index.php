@@ -1,22 +1,12 @@
 <?php
 require_once 'functies/db_connectie.php';
+require_once 'functies/getProducts.php';
 session_start();
 
 // Haal producten op uit de database
-function haalProductenOp() {
-    $conn = maakVerbinding();
-    $sql = "SELECT * FROM product"; // Haal alle producten op uit de tabel 'product'
-    try {
-        $stmt = $conn->query($sql);
-        $producten = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        return $producten;
-    } catch (PDOException $e) {
-        echo "Fout bij ophalen producten: " . $e->getMessage();
-        exit;
-    }
-}
 
-$producten = haalProductenOp(); // Haal de producten op
+
+$producten = getProducts(); // Haal de producten op
 ?>
 
 <!DOCTYPE html>
@@ -41,7 +31,7 @@ $producten = haalProductenOp(); // Haal de producten op
 
   <main>
     <div class="container">
-      <h2>Producten</h2>
+      <h2>Menu</h2>
     </div>
 
     <div class="card-container">
