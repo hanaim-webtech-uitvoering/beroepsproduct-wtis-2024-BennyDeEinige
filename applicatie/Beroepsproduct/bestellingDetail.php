@@ -3,6 +3,7 @@ require_once 'functies/db_connectie.php';
 require_once 'functies/statusInText.php'; 
 
 
+
 session_start();
 
 // Controleer of de gebruiker is ingelogd en personeel is

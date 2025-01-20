@@ -6,7 +6,7 @@ function loginUser($usern, $passw)
     $password = htmlspecialchars(trim($passw)); // Sanitize input
 
     try {
-        // Query voorbereiden
+        // Select query voorbereiden (prepared statement)
         $sql = 'SELECT username, password, role FROM users WHERE username = :username';
         $query = $db->prepare($sql);
         $query->execute([':username' => $username]);
@@ -34,7 +34,7 @@ function loginUser($usern, $passw)
             return 'Gebruikersnaam niet gevonden.';
         }
     } catch (PDOException $e) {
-        return 'Databasefout: ' . $e->getMessage(); // Debugging
+        return 'Databasefout: ' . $e->getMessage(); //foutmeldign
     }
 }
 ?>
