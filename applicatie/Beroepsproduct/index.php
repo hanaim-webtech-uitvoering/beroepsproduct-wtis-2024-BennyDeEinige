@@ -3,9 +3,6 @@ require_once 'functies/db_connectie.php';
 require_once 'functies/getProducts.php';
 session_start();
 
-// Haal producten op uit de database
-
-
 $producten = getProducts(); // Haal de producten op
 ?>
 

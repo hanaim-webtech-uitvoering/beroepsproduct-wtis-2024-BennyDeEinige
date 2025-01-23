@@ -1,21 +1,20 @@
 <?php
 require_once 'functies/db_connectie.php';
 require_once 'functies/getUserOrders.php';
-require_once 'functies/statusInText.php';
+require_once 'functies/statusInText.php'; // Zorg ervoor dat deze functie is inbegrepen
 
 session_start();
 
 // Controleer of de gebruiker is ingelogd
 if (!isset($_SESSION['username'])) {
     header("Location: inloggen.php");
-
+    exit;
 }
 
 $username = $_SESSION['username']; // Haal de gebruikersnaam op uit de sessie
 
-// Haal de bestellingen op
+// Haal de bestellingen op voor de ingelogde gebruiker
 $bestellingen = getUserOrders($username); 
-
 ?>
 
 <!DOCTYPE html>
@@ -52,11 +51,15 @@ $bestellingen = getUserOrders($username);
             </thead>
             <tbody>
                 <?php foreach ($bestellingen as $bestelling): ?>
+                    <?php
+                    // Zet de status om naar leesbare tekst
+                    $statusText = getStatusText($bestelling['status']);
+                    ?>
                     <tr>
-                        <td><?php echo ($bestelling['order_id']); ?></td>
-                        <td><?php echo ($bestelling['datetime']); ?></td>
-                        <td><?php echo ($bestelling['status']); ?></td>
-                        <td><?php echo ($bestelling['address']); ?></td>
+                        <td><a href="bestellingDetail.php?order_id=<?php echo $bestelling['order_id']; ?>"><?php echo $bestelling['order_id']; ?></a></td>
+                        <td><?php echo isset($bestelling['datetime']) ? htmlspecialchars($bestelling['datetime']) : 'N/A'; ?></td> <!-- Controleer of de waarde bestaat -->
+                        <td><?php echo ($bestelling['status']); ?></td> <!-- Zet status om naar tekst -->
+                        <td><?php echo isset($bestelling['address']) ? htmlspecialchars($bestelling['address']) : 'N/A'; ?></td> <!-- Controleer of de waarde bestaat -->
                     </tr>
                 <?php endforeach; ?>
             </tbody>

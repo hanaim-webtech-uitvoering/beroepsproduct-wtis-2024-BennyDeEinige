@@ -18,6 +18,7 @@ function verwerkBestelling($clientUsername, $personnelUsername, $orderDatetime, 
         $stmt->bindParam(':status', $status, PDO::PARAM_STR);
         $stmt->bindParam(':address', $address, PDO::PARAM_STR);
         $stmt->execute();
+        
 
         // Haal het gegenereerde order_id op
         $orderId = $db->lastInsertId();

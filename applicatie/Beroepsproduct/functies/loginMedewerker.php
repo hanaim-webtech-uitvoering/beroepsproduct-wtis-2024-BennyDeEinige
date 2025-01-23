@@ -27,14 +27,10 @@ function loginMedewerker($usern, $passw)
                 } else {
                     return 'Toegang geweigerd. Alleen Medewerkers kunnen hier inloggen.';
                 }
-            } else {
-                return 'Wachtwoord is incorrect.';
             }
-        } else {
-            return 'Gebruikersnaam niet gevonden.';
         }
     } catch (PDOException $e) {
-        return 'Databasefout: ' . $e->getMessage(); // Debugging
+        return 'Er is een probleem met het inloggen. Probeer het later opnieuw.';
     }
 }
 ?>

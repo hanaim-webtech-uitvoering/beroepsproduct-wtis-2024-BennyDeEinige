@@ -2,8 +2,6 @@
 require_once 'functies/db_connectie.php'; 
 require_once 'functies/statusInText.php'; 
 
-
-
 session_start();
 
 // Controleer of de gebruiker is ingelogd en personeel is
@@ -12,13 +10,13 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'Personnel') {
     exit;
 }
 
-// Controleer of een order_id is meegegeven in de URL
-if (!isset($_GET['order_id'])) {
-    echo "Geen bestelling geselecteerd.";
+// Controleer of een order_id is meegegeven in de URL en valideer deze
+if (!isset($_GET['order_id']) || !is_numeric($_GET['order_id']) || $_GET['order_id'] <= 0) {
+    echo "Ongeldige bestelling geselecteerd.";
     exit;
 }
 
-$order_id = $_GET['order_id'];
+$order_id = (int)$_GET['order_id'];
 
 // Haal de bestelling op
 try {
@@ -44,8 +42,16 @@ try {
     $stmtOrder->execute();
     $orderDetails = $stmtOrder->fetch();
 
+    // Controleer of de bestelling bestaat
+    if (!$orderDetails) {
+        echo "Bestelling niet gevonden.";
+        exit;
+    }
+
 } catch (Exception $e) {
-    echo "Fout bij ophalen van de bestelling: " . $e->getMessage();
+    // Log de fout en geef een vriendelijke foutmelding
+    error_log("Fout bij ophalen van de bestelling: " . $e->getMessage());
+    echo "Er is een probleem met het ophalen van de bestelling. Probeer het later opnieuw.";
     exit;
 }
 ?>
@@ -68,14 +74,14 @@ try {
 <?php include_once('functies/navbar.php'); ?>
 
 <main>
-    <h2>Details van Bestelling #<?php echo $order_id; ?></h2>
+    <h2>Details van Bestelling #<?php echo htmlspecialchars($order_id); ?></h2>
     
     <h3>Bestelgegevens</h3>
-    <p><strong>Klant Username:</strong> <?php echo $orderDetails['client_username']; ?></p>
-    <p><strong>Medewerker Username:</strong> <?php echo $orderDetails['personnel_username']; ?></p>
-    <p><strong>Status:</strong> <?php echo getStatusText($orderDetails['status']); ?></p>  
-    <p><strong>Adres:</strong> <?php echo $orderDetails['address']; ?></p>
-    <p><strong>Datum:</strong> <?php echo $orderDetails['datetime']; ?></p>
+    <p><strong>Klant Username:</strong> <?php echo ($orderDetails['client_username']); ?></p>
+    <p><strong>Medewerker Username:</strong> <?php echo htmlspecialchars($orderDetails['personnel_username']); ?></p>
+    <p><strong>Status:</strong> <?php echo htmlspecialchars(getStatusText($orderDetails['status'])); ?></p>  
+    <p><strong>Adres:</strong> <?php echo htmlspecialchars($orderDetails['address']); ?></p>
+    <p><strong>Datum:</strong> <?php echo htmlspecialchars($orderDetails['datetime']); ?></p>
     
     <h3>Bestelde Producten</h3>
     <table>
@@ -90,8 +96,8 @@ try {
             if (count($orderProducts) > 0) {
                 foreach ($orderProducts as $product) {
                     echo "<tr>
-                            <td>{$product['product_name']}</td>
-                            <td>{$product['quantity']}</td>
+                            <td>" . htmlspecialchars($product['product_name']) . "</td>
+                            <td>" . htmlspecialchars($product['quantity']) . "</td>
                           </tr>";
                 }
             } else {
