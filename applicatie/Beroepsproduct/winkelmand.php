@@ -4,154 +4,58 @@ require_once 'functies/bestellingVerwerken.php';
 
 session_start();
 
+// Controleer of de gebruiker is ingelogd
 if (!isset($_SESSION['username'])) {
-    header('Location: inloggen.php'); // Doorverwijzen naar de inlogpagina
+    header('Location: inloggen.php');
     exit;
 }
 
-
-$clientUsername = $_SESSION['username'];  // Haal de gebruikersnaam op uit de sessie
-
-// Start winkelmand als sessie niet is ingesteld
+// Initialiseer winkelmand
 if (!isset($_SESSION['winkelmand'])) {
     $_SESSION['winkelmand'] = [];
 }
 
-// Verkrijg de klantgegevens uit de database (gebruikersnaam wordt gebruikt om te zoeken)
-try {
-    $db = maakVerbinding();
-    $query = "SELECT username, address FROM users WHERE username = :clientUsername";
-    $stmt = $db->prepare($query);
-    $stmt->bindParam(':clientUsername', $clientUsername, PDO::PARAM_STR);
-    $stmt->execute();
+// Haal de gebruikersnaam op uit de sessie
+$clientUsername = $_SESSION['username'];
 
-    // Haal de klantgegevens op
-    $clientData = $stmt->fetch(PDO::FETCH_ASSOC);
+// Verbind met de database
+$db = maakVerbinding();
 
-    if ($clientData) {
-        $clientName = $clientData['username'];  // Klantnaam
-        $clientAddress = $clientData['address'];  // Klantadres
-    } else {
-        echo "Klantgegevens niet gevonden.";
-        exit;
-    }
-} catch (PDOException $e) {
-    echo "Fout bij het ophalen van klantgegevens: " . $e->getMessage();
+// Haal klantgegevens op
+$clientData = haalKlantgegevens($db, $clientUsername);
+if (!$clientData) {
+    echo "Klantgegevens niet gevonden.";
     exit;
 }
 
 // Verwerk toevoegen aan winkelmand
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['product'], $_POST['prijs'], $_POST['aantal'])) {
-    $productNaam = $_POST['product'];
-    $productPrijs = floatval($_POST['prijs']);
-    $productAantal = intval($_POST['aantal']);
-
-    // Controleer of product al in de winkelmand zit
-    $productBestaat = false;
-    foreach ($_SESSION['winkelmand'] as &$item) {
-        if ($item['naam'] === $productNaam) {
-            $productBestaat = true;
-            $item['aantal'] += $productAantal;
-            break;
-        }
-    }
-
-    if (!$productBestaat) {
-        $_SESSION['winkelmand'][] = [
-            'id' => count($_SESSION['winkelmand']),
-            'naam' => $productNaam,
-            'prijs' => $productPrijs,
-            'aantal' => $productAantal
-        ];
-    }
-
+    voegToeAanWinkelmand($_SESSION['winkelmand'], $_POST['product'], $_POST['prijs'], $_POST['aantal']);
     header('Location: winkelmand.php');
     exit;
 }
 
 // Verwerk verwijderverzoek
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verwijder'])) {
-    $index = intval($_POST['verwijder']);
-    if (isset($_SESSION['winkelmand'][$index])) {
-        unset($_SESSION['winkelmand'][$index]);
-        $_SESSION['winkelmand'] = array_values($_SESSION['winkelmand']);
-    }
+    verwijderUitWinkelmand($_SESSION['winkelmand'], intval($_POST['verwijder']));
     header('Location: winkelmand.php');
     exit;
 }
 
 // Verwerk bestelling
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bestel'])) {
-    // Haal het adres op uit de database voor de ingelogde gebruiker
-    $db = maakVerbinding();
-    $query = "SELECT address FROM users WHERE username = :username";
-    $stmt = $db->prepare($query);
-    $stmt->bindParam(':username', $_SESSION['username'], PDO::PARAM_STR);
-    $stmt->execute();
-
-    // Haal het resultaat op
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    // Controleer of het adres bestaat
-    if ($user && isset($user['address'])) {
-        $address = $user['address'];  // Haal het adres uit de database
+    if (verwerkBestelling($db, $clientData)) {
+        $_SESSION['winkelmand'] = []; // Leeg de winkelmand
+        header('Location: ' . bepaalRedirect($_SESSION['role'] ?? null));
+        exit;
     } else {
-        echo "<p>Fout: Het adres van de gebruiker kan niet worden gevonden.</p>";
+        echo "Fout tijdens het verwerken van de bestelling.";
         exit;
     }
-
-    // Sla de winkelmand op als bestelling
-    if (!isset($_SESSION['bestellingen'])) {
-        $_SESSION['bestellingen'] = [];
-    }
-    $_SESSION['bestellingen'][] = $_SESSION['winkelmand'];
-
-    // Haal gegevens van de ingelogde gebruiker op
-    $clientUsername = $_SESSION['username'];
-    $clientName = $clientData['username'];  // Klantnaam
-    $personnelUsername = 'sahar';  // Vaste medewerkerusername
-    $orderDatetime = date('Y-m-d H:i:s');
-    $status = '3';  // Dit kan later dynamisch worden aangepast (bijv. in afwachting, verzonden, etc.)
-
-    // Verbind met de database
-    try {
-        $query = "INSERT INTO pizza_order (client_username, client_name, personnel_username, datetime, status, address) 
-                  VALUES (:client_username, :client_name, :personnel_username, :datetime, :status, :address)";
-        $stmt = $db->prepare($query);
-        $stmt->bindParam(':client_username', $clientUsername);
-        $stmt->bindParam(':client_name', $clientName);
-        $stmt->bindParam(':personnel_username', $personnelUsername);
-        $stmt->bindParam(':datetime', $orderDatetime);
-        $stmt->bindParam(':status', $status);
-        $stmt->bindParam(':address', $address);
-        $stmt->execute();
-
-        // Leeg winkelmand
-        $_SESSION['winkelmand'] = [];
-
-        // Doorverwijzen op basis van de rol van de gebruiker
-        if (isset($_SESSION['role'])) {
-            if ($_SESSION['role'] === 'Personnel') {
-                header('Location: bestellingsOverzicht.php');
-            } elseif ($_SESSION['role'] === 'Client') {
-                header('Location: profiel.php');
-            }
-        } else {
-            // Als de rol onbekend is, terug naar de homepage
-            header('Location: index.php');
-        }
-    } catch (PDOException $e) {
-        echo "Fout tijdens het verwerken van de bestelling: " . $e->getMessage();
-        exit;
-    }
-    exit;
 }
 
-// Hier wordt het totaal gerekend
-$totaal = 0;
-foreach ($_SESSION['winkelmand'] as $item) {
-    $totaal += $item['prijs'] * $item['aantal'];
-}
+// Bereken totaal
+$totaal = berekenTotaal($_SESSION['winkelmand']);
 ?>
 
 <!DOCTYPE html>
@@ -159,7 +63,7 @@ foreach ($_SESSION['winkelmand'] as $item) {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Winkelmand - Pizzeria Sole Machina</title>
+    <title>Pizzeria Sole Machina</title>
     <link rel="stylesheet" href="css/bb.css" />
     <link rel="stylesheet" href="css/normalize.css" />
     <link rel="stylesheet" href="css/les03_grid.css" />

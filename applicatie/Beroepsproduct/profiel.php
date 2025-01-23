@@ -1,7 +1,7 @@
 <?php
 require_once 'functies/db_connectie.php';
 require_once 'functies/getUserOrders.php';
-require_once 'functies/statusInText.php'; // Zorg ervoor dat deze functie is inbegrepen
+require_once 'functies/statusInText.php'; 
 
 session_start();
 

@@ -2,11 +2,14 @@
 require_once 'functies/db_connectie.php';
 require_once 'functies/loginfunctie.php';
 session_start();
+
+// Als er is ingelogd wordt de gebruiker doorgestuurd naar profuel.php
 if (isset($_SESSION['username'])) {
     header("Location: profiel.php");
     exit();
 }
 
+// Het maken van een melding die eventueel gevuld kan worden
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {

@@ -5,17 +5,18 @@ function loginMedewerker($usern, $passw)
     $username = htmlspecialchars(trim($usern)); // Sanitize input
     $password = htmlspecialchars(trim($passw)); // Sanitize input
 
-    try {
-        // Query voorbereiden
-        $sql = 'SELECT username, password, role FROM users WHERE username = :username';
-        $query = $db->prepare($sql);
-        $query->execute([':username' => $username]);
+    // Query voorbereiden
+    $sql = 'SELECT username, password, role FROM users WHERE username = :username';
+    $query = $db->prepare($sql);
+    $executeResult = $query->execute([':username' => $username]);
 
+    // Controleer of de query goed is uitgevoerd
+    if ($executeResult) {
         // Gebruiker ophalen
         $row = $query->fetch(PDO::FETCH_ASSOC);
 
         if ($row) {
-            // Controleer wachtwoord direct
+            // Controleer wachtwoord met password_verify()
             if (password_verify($password, $row['password'])) {
                 // Controleer de rol van de gebruiker
                 if ($row['role'] === 'Personnel') {
@@ -27,10 +28,16 @@ function loginMedewerker($usern, $passw)
                 } else {
                     return 'Toegang geweigerd. Alleen Medewerkers kunnen hier inloggen.';
                 }
+            } else {
+                return 'Wachtwoord is onjuist.';
             }
+        } else {
+            return 'Gebruiker niet gevonden.';
         }
-    } catch (PDOException $e) {
-        return 'Er is een probleem met het inloggen. Probeer het later opnieuw.';
     }
+
+    // Foutmelding als de query niet is uitgevoerd
+    return 'Er is een probleem met het inloggen. Probeer het later opnieuw.';
 }
+
 ?>

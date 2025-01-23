@@ -4,14 +4,17 @@ function getProducts() {
     $sql = "
         SELECT * 
         FROM product
-        ORDER BY type_id, name"; // Sorteer eerst per type_id, dan per naam
+        ORDER BY type_id, name";
 
-    try {
-        $stmt = $conn->query($sql);
+    $stmt = $conn->query($sql);
+    // Controleer of de query goed is uitgevoerd
+    if ($stmt) {
         $producten = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return $producten;
-    } catch (PDOException $e) {
-        echo "Fout bij ophalen producten: " . $e->getMessage();
+    } else {
+        // Foutmelding als de query niet uitgevoerd kan worden
+        echo "Fout bij ophalen producten.";
         exit;
     }
+
 }

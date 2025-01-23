@@ -5,12 +5,13 @@ function loginUser($usern, $passw)
     $username = htmlspecialchars(trim($usern)); // Sanitize input
     $password = htmlspecialchars(trim($passw)); 
 
-    try {
-        // Select query voorbereiden (prepared statement)
-        $sql = 'SELECT username, password, role FROM users WHERE username = :username';
-        $query = $db->prepare($sql);
-        $query->execute([':username' => $username]);
+    // Select query voorbereiden (prepared statement)
+    $sql = 'SELECT username, password, role FROM users WHERE username = :username';
+    $query = $db->prepare($sql);
+    $executeResult = $query->execute([':username' => $username]);
 
+    // Controleer of de query goed is uitgevoerd
+    if ($executeResult) {
         // Gebruiker ophalen
         $row = $query->fetch(PDO::FETCH_ASSOC);
 
@@ -20,7 +21,6 @@ function loginUser($usern, $passw)
                 // Controleer de rol van de gebruiker (dit is voor Clienten)
                 if ($row['role'] === 'Client') {
                     // Start de sessie en bewaar de gebruikersinformatie
-                    //(zo voorkom je dat een gebruiker zich telkens opnieuw moet aanmelden bij elke bezoek).
                     session_start();
                     // Dit voorkomt dat een 'hacker' de sessie-ID van een ingelogde gebruiker kan overnemen.
                     session_regenerate_id(true);
@@ -32,8 +32,9 @@ function loginUser($usern, $passw)
                 }
             }
         }
-    } catch (PDOException $e) {
-        return 'Er is een probleem met het inloggen. Probeer het later opnieuw.';
     }
+
+    // Foutmelding als de query niet is uitgevoerd of login mislukt
+    return 'Er is een probleem met het inloggen. Probeer het later opnieuw.';
 }
 ?>

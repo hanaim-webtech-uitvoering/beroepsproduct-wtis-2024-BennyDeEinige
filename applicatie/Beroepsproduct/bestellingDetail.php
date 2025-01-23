@@ -4,54 +4,32 @@ require_once 'functies/statusInText.php';
 
 session_start();
 
-// Controleer of de gebruiker is ingelogd en personeel is
-if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'Personnel') {
-    header('Location: inloggen.php');
-    exit;
-}
-
-// Controleer of een order_id is meegegeven in de URL en valideer deze
+// Controleer of een order_id is meegegeven in de URL en controleer deze
 if (!isset($_GET['order_id']) || !is_numeric($_GET['order_id']) || $_GET['order_id'] <= 0) {
     echo "Ongeldige bestelling geselecteerd.";
     exit;
 }
 
 $order_id = (int)$_GET['order_id'];
+$db = maakVerbinding();
 
-// Haal de bestelling op
-try {
-    $db = maakVerbinding(); // Maak verbinding met de database
+// Query om de producten van een specifieke bestelling op te halen
+$query = "SELECT product_name, quantity FROM Pizza_Order_Product WHERE order_id = $order_id";
+$queryResult = $db->query($query);
 
-    // SQL-query om de producten van een specifieke bestelling op te halen
-    $query = 'SELECT product_name, quantity
-              FROM Pizza_Order_Product
-              WHERE order_id = :order_id';
+// Haal de resultaten op
+$orderProducts = $queryResult->fetchAll();
 
-    // Bereid en voer de query uit
-    $stmt = $db->prepare($query);
-    $stmt->bindParam(':order_id', $order_id, PDO::PARAM_INT);
-    $stmt->execute();
+// Haal de gegevens van de bestelling op van Pizza_order 
+$queryOrder = 'SELECT * FROM Pizza_order WHERE order_id = :order_id';
+$stmtOrder = $db->prepare($queryOrder);
+$stmtOrder->bindParam(':order_id', $order_id, PDO::PARAM_INT);
+$stmtOrder->execute();
+$orderDetails = $stmtOrder->fetch();
 
-    // Haal de producten op
-    $orderProducts = $stmt->fetchAll();
-
-    // Haal de orderdetails op van Pizza_order 
-    $queryOrder = 'SELECT * FROM Pizza_order WHERE order_id = :order_id';
-    $stmtOrder = $db->prepare($queryOrder);
-    $stmtOrder->bindParam(':order_id', $order_id, PDO::PARAM_INT);
-    $stmtOrder->execute();
-    $orderDetails = $stmtOrder->fetch();
-
-    // Controleer of de bestelling bestaat
-    if (!$orderDetails) {
-        echo "Bestelling niet gevonden.";
-        exit;
-    }
-
-} catch (Exception $e) {
-    // Log de fout en geef een vriendelijke foutmelding
-    error_log("Fout bij ophalen van de bestelling: " . $e->getMessage());
-    echo "Er is een probleem met het ophalen van de bestelling. Probeer het later opnieuw.";
+// Controleer of de bestelling bestaat
+if (!$orderDetails) {
+    echo "Bestelling niet gevonden.";
     exit;
 }
 ?>
@@ -61,7 +39,7 @@ try {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bestelling Details</title>
+    <title>Pizzeria Sole Machina</title>
     <link rel="stylesheet" href="css/bb.css" />
     <link rel="stylesheet" href="css/normalize.css" />
     <link rel="stylesheet" href="css/les03_grid.css" />

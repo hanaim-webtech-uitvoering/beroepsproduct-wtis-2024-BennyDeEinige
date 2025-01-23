@@ -16,29 +16,36 @@ function registreerGebruiker($data)
     }
 
     // Controleer of de gebruikersnaam al bestaat met een query
-    try {
-        $checkQuery = "SELECT username FROM Users WHERE username = ?";
-        $checkStmt = $db->prepare($checkQuery);
-        $checkStmt->execute([$data['username']]);
+    $checkQuery = "SELECT username FROM Users WHERE username = ?";
+    $checkStmt = $db->prepare($checkQuery);
+    
+    // Voer de query uit en controleer of het goed ging
+    $checkResult = $checkStmt->execute([$data['username']]);
+    if (!$checkResult) {
+        return "Er is een probleem met de gebruikersnaamcontrole. Probeer het later opnieuw.";
+    }
 
-        // Als er een resultaat is, bestaat de gebruikersnaam al
-        if ($checkStmt->rowCount() > 0) {
-            return "Deze gebruikersnaam is al in gebruik.";
-        }
-
-        // Versleutel het wachtwoord
-        $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
-        $role = 'Client'; // Standaard rol is 'Client'
-
-        // Voeg de nieuwe gebruiker toe
-        $query = "INSERT INTO Users (first_name, last_name, address, username, password, role) 
-                  VALUES (?, ?, ?, ?, ?, ?)";
-        $stmt = $db->prepare($query);
-        $stmt->execute([$data['first_name'], $data['last_name'], $data['address'], $data['username'], $hashedPassword, $role]);
-
-        return true; // Succesvolle registratie
-    } catch (PDOException $e) {
+    // Als er een resultaat is, bestaat de gebruikersnaam al
+    if ($checkStmt->rowCount() > 0) {
         return "Deze gebruikersnaam is al in gebruik.";
     }
+
+    // Versleutel het wachtwoord
+    $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
+    $role = 'Client'; // Standaard rol is 'Client'
+
+    // Voeg de nieuwe gebruiker toe
+    $query = "INSERT INTO Users (first_name, last_name, address, username, password, role) 
+              VALUES (?, ?, ?, ?, ?, ?)";
+    $stmt = $db->prepare($query);
+    
+    // Voer de insert-query uit en controleer of deze succesvol was
+    $insertResult = $stmt->execute([$data['first_name'], $data['last_name'], $data['address'], $data['username'], $hashedPassword, $role]);
+    
+    if (!$insertResult) {
+        return "Er is een probleem met het registreren van de gebruiker. Probeer het later opnieuw.";
+    }
+
+    return true; // Succesvolle registratie
 }
 ?>
