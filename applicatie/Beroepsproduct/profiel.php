@@ -68,7 +68,7 @@ $bestellingen = getUserOrders($username);
         <p>Je hebt nog geen bestellingen geplaatst.</p>
     <?php endif; ?>
     
-    <p>Dit is jouw profielpagina.</p>
+
     <a href="functies/logout.php">Uitloggen</a>
   </div>
 
