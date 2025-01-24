@@ -23,8 +23,8 @@ $orderProducts = $queryResult->fetchAll();
 // Haal de gegevens van de bestelling op van Pizza_order 
 $queryOrder = 'SELECT * FROM Pizza_order WHERE order_id = :order_id';
 $stmtOrder = $db->prepare($queryOrder);
-$stmtOrder->bindParam(':order_id', $order_id, PDO::PARAM_INT);
-$stmtOrder->execute();
+// Direct parameter binden via execute
+$stmtOrder->execute([':order_id' => $order_id]);
 $orderDetails = $stmtOrder->fetch();
 
 // Controleer of de bestelling bestaat

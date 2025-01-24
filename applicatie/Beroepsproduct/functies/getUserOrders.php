@@ -21,8 +21,8 @@ function getUserOrders($username) {
     ";
 
     $stmt = $db->prepare($query);
-    $stmt->bindParam(':username', $username, PDO::PARAM_STR);
-    $stmt->execute();
+    $stmt->execute([':username' => $username]);
+
 
     // Haal de resultaten op
     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);

@@ -55,15 +55,17 @@ function verwerkBestelling($db, $clientData)
     $query = "INSERT INTO pizza_order (client_username, client_name, personnel_username, datetime, status, address) 
               VALUES (:client_username, :client_name, :personnel_username, :datetime, :status, :address)";
     $stmt = $db->prepare($query);
-    $stmt->bindParam(':client_username', $clientUsername);
-    $stmt->bindParam(':client_name', $clientName);
-    $stmt->bindParam(':personnel_username', $personnelUsername);
-    $stmt->bindParam(':datetime', $orderDatetime);
-    $stmt->bindParam(':status', $status);
-    $stmt->bindParam(':address', $address);
+    $stmt->execute([
+        ':client_username' => $clientUsername,
+        ':client_name' => $clientName,
+        ':personnel_username' => $personnelUsername,
+        ':datetime' => $orderDatetime,
+        ':status' => $status,
+        ':address' => $address
+    ]);
 
     // Probeer de bestelling in te voeren
-    if ($stmt->execute()) {
+    if ($stmt->rowCount()) {
         // Haal het laatst ingevoegde order_id op
         $order_id = $db->lastInsertId();
 
@@ -72,10 +74,11 @@ function verwerkBestelling($db, $clientData)
             $query = "INSERT INTO Pizza_Order_Product (order_id, product_name, quantity) 
                       VALUES (:order_id, :product_name, :quantity)";
             $stmt = $db->prepare($query);
-            $stmt->bindParam(':order_id', $order_id);
-            $stmt->bindParam(':product_name', $item['naam']);
-            $stmt->bindParam(':quantity', $item['aantal']);
-            $stmt->execute();
+            $stmt->execute([
+                ':order_id' => $order_id,
+                ':product_name' => $item['naam'],
+                ':quantity' => $item['aantal']
+            ]);
         }
 
         return true;
@@ -84,15 +87,13 @@ function verwerkBestelling($db, $clientData)
     return false;
 }
 
-
-
 // Haal klantgegevens op
 function haalKlantgegevens($db, $clientUsername)
 {
     $query = "SELECT username, address FROM users WHERE username = :clientUsername";
     $stmt = $db->prepare($query);
-    $stmt->bindParam(':clientUsername', $clientUsername, PDO::PARAM_STR);
-    
+    $stmt->execute([':clientUsername' => $clientUsername]);
+
     if (!$stmt->execute()) {
         return null;
     }
